@@ -2,6 +2,8 @@ import json
 import sys
 
 import requests
+import codecs
+
 from requests.utils import get_netrc_auth
 
 TMP_FILE = '/tmp/pinboard.json'  # May not exist in all platforms
@@ -60,7 +62,7 @@ def tmpjsonfile_to_orgfile(orgfile):
   {extended}
 """
 
-    with open(orgfile, 'w') as fout:
+    with codecs.open(orgfile, 'w', encoding='utf-8') as fout:
         fout.write(header)
         for l in json_lines:
             description = l['description']
