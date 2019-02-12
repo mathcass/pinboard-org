@@ -55,6 +55,7 @@ def tmpjsonfile_to_orgfile(orgfile):
     org_template = """* [[{href}][{description}]]   {joined_tags}
   :PROPERTIES:
   :TIME_SAVED: {time}
+  :URL: {href}
   :END:
   {extended}
 """
