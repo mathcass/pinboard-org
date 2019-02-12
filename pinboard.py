@@ -67,14 +67,24 @@ def tmpjsonfile_to_orgfile(orgfile):
         for l in json_lines:
             description = l['description']
             href = l['href']
-            tags = l['tags'].split(' ')
-            time = l['time']
+            server_tags = l['tags'].split(' ')
+            server_tags_fixed = [w.replace('-', '_') for w in server_tags]
+            tags = list(filter(None, server_tags_fixed))
+            if tags:
+                joined_tags = ":".join([""] + tags + [""])
+            else:
+                joined_tags = ""
+            server_time = datetime.datetime.strptime(l['time'],
+                                                     '%Y-%m-%dT%H:%M:%SZ')
+            org_time = org_time_format.format(server_time)
+
             extended = l['extended']
             org_line = org_template.format(description=description,
                                            href=href,
-                                           joined_tags=":".join(tags),
-                                           time=time,
+                                           joined_tags=joined_tags,
+                                           time=org_time,
                                            extended=extended)
+            # print("Writing: ", org_line.encode('utf-8'))
             fout.write(org_line)
 
 
