@@ -43,7 +43,8 @@ def tmpjsonfile_to_orgfile(orgfile):
     # * extended (extended text along with it)
 
     user = getpass.getuser()
-    now = datetime.datetime.isoformat(datetime.datetime.now())
+    org_time_format = '{0:[%Y-%m-%d %a %H:%M]}'
+    now = org_time_format.format(datetime.datetime.now())
     header = """#+TITLE: Pinboard.in Export
 #+AUTHOR: {user}
 #+EXPORT_TIME: {time}
