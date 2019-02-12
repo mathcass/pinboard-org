@@ -52,9 +52,9 @@ def tmpjsonfile_to_orgfile(orgfile):
 """.format(user=user,
            time=now)
 
-    org_template = """* [[{href}][{description}]] {joined_tags}
+    org_template = """* [[{href}][{description}]]   {joined_tags}
   :PROPERTIES:
-  :Time_Saved: {time}
+  :TIME_SAVED: {time}
   :END:
   {extended}
 """
