@@ -2,6 +2,8 @@ import json
 import sys
 
 import requests
+import codecs
+
 from requests.utils import get_netrc_auth
 
 TMP_FILE = '/tmp/pinboard.json'  # May not exist in all platforms
@@ -43,7 +45,8 @@ def tmpjsonfile_to_orgfile(orgfile):
     # * extended (extended text along with it)
 
     user = getpass.getuser()
-    now = datetime.datetime.isoformat(datetime.datetime.now())
+    org_time_format = '{0:[%Y-%m-%d %a %H:%M]}'
+    now = org_time_format.format(datetime.datetime.now())
     header = """#+TITLE: Pinboard.in Export
 #+AUTHOR: {user}
 #+EXPORT_TIME: {time}
@@ -51,26 +54,37 @@ def tmpjsonfile_to_orgfile(orgfile):
 """.format(user=user,
            time=now)
 
-    org_template = """* [[{href}][{description}]] {joined_tags}
+    org_template = """* [[{href}][{description}]]   {joined_tags}
   :PROPERTIES:
-  :Time_Saved: {time}
+  :TIME_SAVED: {time}
+  :URL: {href}
   :END:
   {extended}
 """
 
-    with open(orgfile, 'w') as fout:
+    with codecs.open(orgfile, 'w', encoding='utf-8') as fout:
         fout.write(header)
         for l in json_lines:
             description = l['description']
             href = l['href']
-            tags = l['tags'].split(' ')
-            time = l['time']
+            server_tags = l['tags'].split(' ')
+            server_tags_fixed = [w.replace('-', '_') for w in server_tags]
+            tags = list(filter(None, server_tags_fixed))
+            if tags:
+                joined_tags = ":".join([""] + tags + [""])
+            else:
+                joined_tags = ""
+            server_time = datetime.datetime.strptime(l['time'],
+                                                     '%Y-%m-%dT%H:%M:%SZ')
+            org_time = org_time_format.format(server_time)
+
             extended = l['extended']
             org_line = org_template.format(description=description,
                                            href=href,
-                                           joined_tags=":".join(tags),
-                                           time=time,
+                                           joined_tags=joined_tags,
+                                           time=org_time,
                                            extended=extended)
+            # print("Writing: ", org_line.encode('utf-8'))
             fout.write(org_line)
 
 
